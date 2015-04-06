@@ -78,6 +78,13 @@ object Test {
     lazy val sc = new SparkContext(conf)
     lazy val ssc = new StreamingContext(sc, Seconds(1))
 
+    // https://twitter.com/pwendell/status/580242656082546688
+    sys.ShutdownHookThread {
+      log.info("Gracefully stopping Spark Streaming Application")
+      ssc.stop(true, true)
+      log.info("Application stopped.")
+    }
+
     lazy val cc = CassandraConnector(sc.getConf)
     createSchema(cc, cassandraKeyspace, cassandraCfCounters, cassandraCfEvents)
 
