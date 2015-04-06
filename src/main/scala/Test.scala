@@ -80,9 +80,7 @@ object Test {
 
     // https://twitter.com/pwendell/status/580242656082546688
     sys.ShutdownHookThread {
-      log.info("Gracefully stopping Spark Streaming Application")
       ssc.stop(true, true)
-      log.info("Application stopped.")
     }
 
     lazy val cc = CassandraConnector(sc.getConf)
