@@ -1,14 +1,21 @@
 spark_streaming_aggregation
 ===========================
 
-Event aggregation with spark streaming
+Event aggregation with spark streaming. The example includes event aggregation over Kafka or TCP event streams.
 
-### To build and run
+### To build and run the Kafka example
 1. Build the assembly ```./sbt/sbt package```
 1. Make sure you've got a running spark server and Cassandra node listening on localhost
-1. Start netcat on port 9999 ```nc -lk 9999```
-1. Submit the assembly to the spark server ```dse spark-submit --class Test ./target/scala-2.10/sparkstreamingaggregation_2.10-0.1.jar```
-1. Post sample records by pasting them to the terminal running netcat ```2014-10-07T12:20:09Z;foo;1```
+1. Make sure you've got a running Kafka server on localhost with the topic 'events' pre-provisioned.
+1. Start the Kafka producer ```./sbt/sbt "run-main KafkaProducer"```
+1. Submit the assembly to the spark server ```dse spark-submit --class KafkaConsumer ./target/scala-2.10/sparkstreamingaggregation_2.10-0.2.jar```
+1. Data will be posted to the C* column families ```demo.event_log``` and ```demo.event_counters```
+
+### To build and run the TCP example
+1. Build the assembly ```./sbt/sbt package```
+1. Make sure you've got a running spark server and Cassandra node listening on localhost
+1. Start the TCP producer ```./sbt/sbt "run-main TcpProducer"```
+1. Submit the assembly to the spark server ```dse spark-submit --class TcpConsumer ./target/scala-2.10/sparkstreamingaggregation_2.10-0.2.jar```
 1. Data will be posted to the C* column families ```demo.event_log``` and ```demo.event_counters```
 
 ### Example output
