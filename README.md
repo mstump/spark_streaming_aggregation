@@ -6,7 +6,7 @@ Event aggregation with spark streaming. The example includes event aggregation o
 ### To build and run the Kafka example
 1. Build the assembly ```./sbt/sbt package```
 1. Make sure you've got a running spark server and Cassandra node listening on localhost
-1. Make sure you've got a running Kafka server on localhost with the topic 'events' pre-provisioned.
+1. Make sure you've got a running Kafka server on localhost with the topic ```events``` pre-provisioned.
 1. Start the Kafka producer ```./sbt/sbt "run-main KafkaProducer"```
 1. Submit the assembly to the spark server ```dse spark-submit --class KafkaConsumer ./target/scala-2.10/sparkstreamingaggregation_2.10-0.2.jar```
 1. Data will be posted to the C* column families ```demo.event_log``` and ```demo.event_counters```
