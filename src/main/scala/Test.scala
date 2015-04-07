@@ -23,10 +23,7 @@ import com.datastax.spark.connector.streaming._
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.driver.core.ConsistencyLevel
 import com.datastax.driver.core.utils.UUIDs
-
-// import org.apache.spark.streaming._
 import org.apache.spark.streaming.kafka._
-// import org.apache.spark.SparkConf
 
 object Test {
 
@@ -90,21 +87,13 @@ object Test {
     // for testing purposes you can use the alternative input below
     // val input = sc.parallelize(sampleRecords)
     // val input = ssc.socketTextStream("localhost", 9999)
-    // val Array(zkQuorum, group, topics, numThreads) = args
-
     val zkQuorum = "localhost:2181"
     val inputTopic = "events"
-
-    val kafkaParams = Map(
-      "zk.connect" -> "127.0.0.1:2181",
-      "zookeeper.connect" -> "localhost:2181",
-      "zookeeper.connection.timeout.ms" -> "1000",
-      "group.id" -> "spark-streaming-test",
-      "zookeeper.connection.timeout.ms" -> "1000")
 
     val input = KafkaUtils.createStream(
       ssc,
       "localhost:2181",
+      "spark-streaming-test",
       Map(inputTopic -> 1)).map(_._2)
 
     input.print()
@@ -148,9 +137,7 @@ object KafkaEventProducer {
     val config = new ProducerConfig(props)
     val producer = new Producer[String, String](config)
 
-    // "2014-10-07T12:20:08Z;foo;1"
-
-    // Send some messages
+    // Send some messages "2014-10-07T12:20:08Z;foo;1"
     while(true) {
       val eventCount = scala.util.Random.nextInt(10).toString()
       val eventString = "2014-10-07T12:20:08Z;foo;" + eventCount
