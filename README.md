@@ -1,7 +1,7 @@
 spark_streaming_aggregation
 ===========================
 
-Event aggregation with spark streaming. The example includes event aggregation over Kafka or TCP event streams.
+Event aggregation with spark streaming. The example includes event aggregation over Kafka or TCP event streams. The instructions are [DSE specific](http://www.datastax.com/download) but this should work on a standalone cluster.
 
 ### To build and run the Kafka example
 1. Build the assembly ```./sbt/sbt package```
@@ -17,6 +17,10 @@ Event aggregation with spark streaming. The example includes event aggregation o
 1. Start the TCP producer ```./sbt/sbt "run-main TcpProducer"```
 1. Submit the assembly to the spark server ```dse spark-submit --class TcpConsumer ./target/scala-2.10/sparkstreamingaggregation_2.10-0.2.jar```
 1. Data will be posted to the C* column families ```demo.event_log``` and ```demo.event_counters```
+
+### "java.lang.NoSuchMethodException" exception
+If you get the exception ```java.lang.NoSuchMethodException``` follow [this guide](https://support.datastax.com/entries/78731079--java-lang-NoSuchMethodException-seen-when-attempting-Spark-streaming-from-Kafka) to alleviate the problem.
+
 
 ### Example output
 ```
