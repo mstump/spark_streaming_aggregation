@@ -7,6 +7,9 @@
 // 2014-10-07T12:22:10Z;foo;1
 // 2014-10-07T12:23:11Z;foo;29
 
+import java.util.Properties
+import kafka.producer.{ProducerConfig, KeyedMessage, Producer}
+
 import org.apache.spark._
 import org.apache.spark.SparkContext._
 import org.apache.spark.streaming._
@@ -21,6 +24,9 @@ import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.driver.core.ConsistencyLevel
 import com.datastax.driver.core.utils.UUIDs
 
+// import org.apache.spark.streaming._
+import org.apache.spark.streaming.kafka._
+// import org.apache.spark.SparkConf
 
 object Test {
 
@@ -83,11 +89,30 @@ object Test {
 
     // for testing purposes you can use the alternative input below
     // val input = sc.parallelize(sampleRecords)
-    val input = ssc.socketTextStream("localhost", 9999)
+    // val input = ssc.socketTextStream("localhost", 9999)
+    // val Array(zkQuorum, group, topics, numThreads) = args
+
+    val zkQuorum = "localhost:2181"
+    val inputTopic = "events"
+
+    val kafkaParams = Map(
+      "zk.connect" -> "127.0.0.1:2181",
+      "zookeeper.connect" -> "localhost:2181",
+      "zookeeper.connection.timeout.ms" -> "1000",
+      "group.id" -> "spark-streaming-test",
+      "zookeeper.connection.timeout.ms" -> "1000")
+
+    val input = KafkaUtils.createStream(
+      ssc,
+      "localhost:2181",
+      Map(inputTopic -> 1)).map(_._2)
+
+    input.print()
+
     val parsedRecords = input.map(parseMessage)
     val bucketedRecords = parsedRecords.map(record => ((record.bucket, record.name), record))
     val bucketedCounts = bucketedRecords.combineByKey(
-      (record) => record.count,
+      (record:Record) => record.count,
       (count:Long, record:Record) => (count + record.count),
       (c1:Long, c2:Long) => (c1 + c2),
       new HashPartitioner(1))
@@ -101,4 +126,37 @@ object Test {
     ssc.start()
     ssc.awaitTermination()
   }
+}
+
+
+object KafkaEventProducer {
+
+  def main(args: Array[String]) {
+
+    if (args.length < 4) {
+      System.err.println("Usage: KafkaEventProducer <metadataBrokerList> <topic> <messagesPerSec> <wordsPerMessage>")
+      System.exit(1)
+    }
+
+    val Array(brokers, topic, messagesPerSec, wordsPerMessage) = args
+
+    // Zookeeper connection properties
+    val props = new Properties()
+    props.put("metadata.broker.list", brokers)
+    props.put("serializer.class", "kafka.serializer.StringEncoder")
+
+    val config = new ProducerConfig(props)
+    val producer = new Producer[String, String](config)
+
+    // "2014-10-07T12:20:08Z;foo;1"
+
+    // Send some messages
+    while(true) {
+      val eventCount = scala.util.Random.nextInt(10).toString()
+      val eventString = "2014-10-07T12:20:08Z;foo;" + eventCount
+      producer.send(new KeyedMessage[String, String]("events", eventString))
+      Thread.sleep(100)
+    }
+  }
+
 }
