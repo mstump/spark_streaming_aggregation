@@ -21,6 +21,12 @@ Event aggregation with spark streaming. The example includes event aggregation o
 ### "java.lang.NoSuchMethodException" exception
 If you get the exception ```java.lang.NoSuchMethodException``` follow [this guide](https://support.datastax.com/entries/78731079--java-lang-NoSuchMethodException-seen-when-attempting-Spark-streaming-from-Kafka) to alleviate the problem.
 
+### Kafka serialization errors
+If you installed Kafka via Homebrew, and see serialization errors on start it's probably because you're using Java 7, and Kafka was compiled with Java 8. Two possible workarounds exist: reinstall Kafka but don't use a keg, install the Java 8 JDK and supply the ```JAVA_HOME``` enviroment variable. Example below.
+```
+JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin kafka-server-start.sh /usr/local/etc/kafka/server.properties
+```
+
 
 ### Example output
 ```
