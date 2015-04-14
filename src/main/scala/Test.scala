@@ -113,6 +113,11 @@ object StreamConsumer {
     parsedRecords.saveToCassandra(Config.cassandraKeyspace, Config.cassandraCfEvents)
     flattenCounts.saveToCassandra(Config.cassandraKeyspace, Config.cassandraCfCounters)
 
+    // https://twitter.com/pwendell/status/580242656082546688
+    sys.ShutdownHookThread {
+      ssc.stop(true, true)
+    }
+
     ssc.start()
     ssc.awaitTermination()
   }
